@@ -70,24 +70,23 @@ public class BookController {
 
             return preparedStatement;
         }, keyHolder);
-
-        long newCustomerId = keyHolder.getKey().longValue();
-        return new ResponseEntity<>(getCustomer(newCustomerId),
+        
+        return new ResponseEntity<>(getBookInfo(),
                 HttpStatus.CREATED);
     }
 
     @PutMapping("/book/{id}")
-    public Book updateCustomer(@PathVariable Long id,
+    public Book updateBook(@PathVariable Long id,
                                @RequestBody Book book) {
         jdbcTemplate.update(
                 "UPDATE book SET nazev = ?, autor = ?, jazyk = ? WHERE id = ?",
                 book.getNazev(), book.getAutor(), book.getJazyk(), id);
 
-        return getCustomer(id);
+        return getBookInfo();
     }
 
-    @DeleteMapping("/customer/{id}")
-    public ResponseEntity deleteCustomer(@PathVariable Long id) {
+    @DeleteMapping("/book/{id}")
+    public ResponseEntity deleteBook(@PathVariable Long id) {
         jdbcTemplate.update("DELETE FROM book WHERE id = ?", id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
