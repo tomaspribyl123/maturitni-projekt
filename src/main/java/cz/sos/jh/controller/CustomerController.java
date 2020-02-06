@@ -1,61 +1,94 @@
 package cz.sos.jh.controller;
 
-import cz.sos.jh.model.Customer;
-import org.springframework.beans.factory.annotation.Autowired;
+import cz.sos.jh.model.Book;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+;
 
 @RestController
-public class CustomerController {
-    static final int PAGE_SIZE = 3;
-
-
-
+public class BookController {
     JdbcTemplate jdbcTemplate;
 
-    public CustomerController(JdbcTemplate jdbcTemplate) {
+    public BookController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @GetMapping("/test")
-    public String test(){
-      return "Hello World";
-}
-@GetMapping("/customer/{id}")
-    public Customer getCustomer(@PathVariable Long id){
+    @GetMapping("/customer/info")
+    public Book getBookInfo() {
+        List<Book> books = jdbcTemplate.query(
+                "SELECT id, autor, vydavatel, jazyk FROM book",
+                new BeanPropertyRowMapper<>(Book.class));
 
-        return jdbcTemplate.queryForObject
-                ("SELECT id, name, city FROM customer WHERE id= ?",
-            new Object[]{id}
-           , new BeanPropertyRowMapper<>(Customer.class));
+        int pocetKnih = books.size();
+        List<String> autori = new ArrayList<>();
+        List<String> vydavatele = new ArrayList<>();
 
-
-
-    }
-    @GetMapping("/customer")
-    public List<Customer> getCustomers(@RequestParam(required = false, defaultValue = "1") Integer pageNo){
-        {
-            return jdbcTemplate.query("SELECT id, name, city FROM customer ORDER BY id LIMIT ? , ?",
-                    new Object[]{getHowMuchRowsToSkip(pageNo), PAGE_SIZE}
-                    , new BeanPropertyRowMapper<>(Customer.class));
+        for (Book book : books) {
+            autori.add(book.getAutor());
+            vydavatele.add(book.getVydavatel());
         }
 
+        Book bookInfo = new Book();
+        bookInfo.setPocetKnih(pocetKnih);
+        bookInfo.setAutor(String.valueOf(autori));
+        bookInfo.setVydavatel(String.valueOf(vydavatele));
+
+        return getBookInfo();
     }
 
-    @PostMapping("/customer")
-    public Customer createCustomer(@RequestBody Customer customer){
-           return customer;
+    @GetMapping("/customer/{id}")
+    public Book getCustomer(@PathVariable Long id) {
+        return jdbcTemplate.queryForObject(
+                "SELECT id, autor, vydavatel, jazyk FROM book WHERE id = ?",
+                new Object[]{id},
+                new BeanPropertyRowMapper<>(Book.class));
     }
 
-    private int getHowMuchRowsToSkip(int pageNo){
-        if(pageNo <= 0){
-            throw new IllegalArgumentException("sdsds");
-        }
-        return (pageNo - 1) * PAGE_SIZE;
+    @PostMapping("/book")
+    public ResponseEntity<Book> createCustomer(@RequestBody Book book) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "INSERT INTO book (autor, datum_vydani, vydavatel) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, book.getAutor());
+            preparedStatement.setString(2, book.getDatum_vydani());
+            preparedStatement.setString(3, book.getVydavatel());
+
+            return preparedStatement;
+        }, keyHolder);
+
+        long newCustomerId = keyHolder.getKey().longValue();
+        return new ResponseEntity<>(getCustomer(newCustomerId),
+                HttpStatus.CREATED);
+    }
+
+    @PutMapping("/book/{id}")
+    public Book updateCustomer(@PathVariable Long id,
+                               @RequestBody Book book) {
+        jdbcTemplate.update(
+                "UPDATE book SET nazev = ?, autor = ?, jazyk = ? WHERE id = ?",
+                book.getNazev(), book.getAutor(), book.getJazyk(), id);
+
+        return getCustomer(id);
+    }
+
+    @DeleteMapping("/customer/{id}")
+    public ResponseEntity deleteCustomer(@PathVariable Long id) {
+        jdbcTemplate.update("DELETE FROM book WHERE id = ?", id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
