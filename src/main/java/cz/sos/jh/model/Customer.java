@@ -1,45 +1,71 @@
 package cz.sos.jh.model;
 
-public class Customer {
+import java.util.List;
+
+public class Book {
+    String nazev;
+    String zanr;
+    String autor;
+    String datum_vydani;
+    String jazyk;
+    String vydavatel;
+    int pocetKnih;
 
 
-    Long id;
-
-    String name;
-
-String city;
-
-Integer grade;
-
-    public Long getId() {
-        return id;
+    public int getPocetKnih() {
+        return pocetKnih;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPocetKnih(int pocetKnih) {
+        this.pocetKnih = pocetKnih;
     }
 
-    public String getName() {
-        return name;
+
+    public String getNazev() {
+        return nazev;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNazev(String nazev) {
+        this.nazev = nazev;
     }
 
-    public String getCity() {
-        return city;
+    public String getZanr() {
+        return zanr;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setZanr(String zanr) {
+        this.zanr = zanr;
     }
 
-    public Integer getGrade() {
-        return grade;
+    public String getAutor() {
+        return autor;
     }
 
-    public void setGrade(Integer grade) {
-        this.grade = grade;
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
+    public String getDatum_vydani() {
+        return datum_vydani;
+    }
+
+    public void setDatum_vydani(String datum_vydani) {
+        this.datum_vydani = datum_vydani;
+    }
+
+    public String getJazyk() {
+        return jazyk;
+    }
+
+    public void setJazyk(String jazyk) {
+        this.jazyk = jazyk;
+    }
+
+    public String getVydavatel() {
+        return vydavatel;
+    }
+
+    public void setVydavatel(String vydavatel) {
+        this.vydavatel = vydavatel;
     }
 }
