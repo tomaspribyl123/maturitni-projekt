@@ -13,12 +13,13 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
 
-    public void handleNonExistingResource(){
+    public void handleNonExistingResource() {
 
-}
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void handleIllegalArgument(){
+    public void handleIllegalArgument() {
 
     }
 
