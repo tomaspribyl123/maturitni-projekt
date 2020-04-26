@@ -4,21 +4,12 @@ import java.util.List;
 
 public class Book {
     String nazev;
-    String zanr;
     String autor;
-    String datum_vydani;
+    String zanr;
+    String rok_vydani;
     String jazyk;
     String vydavatel;
     int pocetKnih;
-
-
-    public int getPocetKnih() {
-        return pocetKnih;
-    }
-
-    public void setPocetKnih(int pocetKnih) {
-        this.pocetKnih = pocetKnih;
-    }
 
 
     public String getNazev() {
@@ -29,14 +20,6 @@ public class Book {
         this.nazev = nazev;
     }
 
-    public String getZanr() {
-        return zanr;
-    }
-
-    public void setZanr(String zanr) {
-        this.zanr = zanr;
-    }
-
     public String getAutor() {
         return autor;
     }
@@ -45,12 +28,20 @@ public class Book {
         this.autor = autor;
     }
 
-    public String getDatum_vydani() {
-        return datum_vydani;
+    public String getZanr() {
+        return zanr;
     }
 
-    public void setDatum_vydani(String datum_vydani) {
-        this.datum_vydani = datum_vydani;
+    public void setZanr(String zanr) {
+        this.zanr = zanr;
+    }
+
+    public String getRok_vydani() {
+        return rok_vydani;
+    }
+
+    public void setRok_vydani(String rok_vydani) {
+        this.rok_vydani = rok_vydani;
     }
 
     public String getJazyk() {
@@ -67,5 +58,13 @@ public class Book {
 
     public void setVydavatel(String vydavatel) {
         this.vydavatel = vydavatel;
+    }
+
+    public int getPocetKnih() {
+        return pocetKnih;
+    }
+
+    public void setPocetKnih(int pocetKnih) {
+        this.pocetKnih = pocetKnih;
     }
 }
