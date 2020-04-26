@@ -15,7 +15,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-;
 
 @RestController
 public class BookController {
@@ -25,13 +24,13 @@ public class BookController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @GetMapping("/customer/info")
+    @GetMapping("/book/info")
     public Book getBookInfo() {
         List<Book> books = jdbcTemplate.query(
-                "SELECT id, autor, vydavatel, jazyk FROM book",
+                "SELECT id, nazev, autor, zanr,rok_vydani,jazyk,vydavatel FROM knihy",
                 new BeanPropertyRowMapper<>(Book.class));
 
-        int pocetKnih = books.size();
+
         List<String> autori = new ArrayList<>();
         List<String> vydavatele = new ArrayList<>();
 
@@ -41,53 +40,54 @@ public class BookController {
         }
 
         Book bookInfo = new Book();
-        bookInfo.setPocetKnih(pocetKnih);
         bookInfo.setAutor(String.valueOf(autori));
         bookInfo.setVydavatel(String.valueOf(vydavatele));
 
         return getBookInfo();
     }
 
-    @GetMapping("/customer/{id}")
-    public Book getCustomer(@PathVariable Long id) {
+    @GetMapping("/book/{id}")
+    public Book getBookById(@PathVariable Long id) {
         return jdbcTemplate.queryForObject(
-                "SELECT id, autor, vydavatel, jazyk FROM book WHERE id = ?",
+                "SELECT id, nazev, autor, zanr FROM knihy WHERE id = ?",
                 new Object[]{id},
                 new BeanPropertyRowMapper<>(Book.class));
     }
+    @PutMapping("/book/{id}")
+    public ResponseEntity updateBook(@PathVariable Long id,
+                                     @RequestBody Book book) {
+        jdbcTemplate.update(
+                "UPDATE book SET nazev = ?, autor = ?, zanr= ?, rok_vydani=?, jazyk = ?, vydavatel = ? WHERE id = ?",
+                book.getNazev(), book.getAutor(),book.getZanr(),book.getRok_vydani(), book.getJazyk(),book.getVydavatel(), id);
 
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
     @PostMapping("/book")
-    public ResponseEntity<Book> createCustomer(@RequestBody Book book) {
+    public ResponseEntity<Book> createBook(@RequestBody Book book) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO book (autor, datum_vydani, vydavatel) VALUES (?, ?, ?)",
+                    "INSERT INTO knihy (nazev, autor, zanr, rok_vydani, jazyk, vydavatel) VALUES (?, ?, ? , ? , ? , ?)",
                     Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, book.getAutor());
-            preparedStatement.setString(2, book.getDatum_vydani());
-            preparedStatement.setString(3, book.getVydavatel());
+            preparedStatement.setString(1, book.getNazev());
+            preparedStatement.setString(2, book.getAutor());
+            preparedStatement.setString(3, book.getZanr());
+            preparedStatement.setString(4, book.getRok_vydani());
+            preparedStatement.setString(5, book.getJazyk());
+            preparedStatement.setString(6, book.getVydavatel());
 
             return preparedStatement;
         }, keyHolder);
-        
+
         return new ResponseEntity<>(getBookInfo(),
                 HttpStatus.CREATED);
     }
 
-    @PutMapping("/book/{id}")
-    public Book updateBook(@PathVariable Long id,
-                               @RequestBody Book book) {
-        jdbcTemplate.update(
-                "UPDATE book SET nazev = ?, autor = ?, jazyk = ? WHERE id = ?",
-                book.getNazev(), book.getAutor(), book.getJazyk(), id);
-
-        return getBookInfo();
-    }
 
     @DeleteMapping("/book/{id}")
     public ResponseEntity deleteBook(@PathVariable Long id) {
-        jdbcTemplate.update("DELETE FROM book WHERE id = ?", id);
+        jdbcTemplate.update("DELETE FROM knihy WHERE id = ?", id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
